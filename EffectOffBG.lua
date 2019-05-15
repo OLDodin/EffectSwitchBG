@@ -132,6 +132,7 @@ local function OnEventSecondTimer()
 		local battleInfo = matchMaking.GetCurrentBattleInfo()
 		if battleInfo and not battleInfo.isPvE then
 			local settings = GetCurrentSettings()
+			--LogInfo("battleInfo.mechanicsType = ", battleInfo.mechanicsType)
 			if (settings.useInRatingPVP or settings.useInAnyBG) and battleInfo.mechanicsType == "ENUM_RATING_ARENA" then
 				OnBattleChanged(true)
 				switchActive = true

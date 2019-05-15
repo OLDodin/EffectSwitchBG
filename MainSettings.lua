@@ -119,7 +119,7 @@ function LoadMainFormSettings(aForm)
 		savedSettings.groupBG.useMageEffects = false
 		savedSettings.groupBG.useGrass = false
 		savedSettings.groupBG.useProcTextures = false
-		savedSettings.groupBG.effectTransTxt = "10"
+		savedSettings.groupBG.effectTransTxt = "30"
 		
 		savedSettings.groupNormal = ReadGameSettings()
 		
