@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UIRelatedTexts>
+  <items>
+    <Item>
+      <name>useAtmoEffects</name>
+      <resource href="useAtmoEffects.txt"/>
+    </Item>
+    <Item>
+      <name>usePostEffects</name>
+      <resource href="usePostEffects.txt"/>
+    </Item>
+    <Item>
+      <name>useLightEffects</name>
+      <resource href="useLightEffects.txt"/>
+    </Item>
+    <Item>
+      <name>useMageEffects</name>
+      <resource href="useMageEffects.txt"/>
+    </Item>
+    <Item>
+      <name>useGrass</name>
+      <resource href="useGrass.txt"/>
+    </Item>
+    <Item>
+      <name>useProcTextures</name>
+      <resource href="useProcTextures.txt"/>
+    </Item>
+    <Item>
+      <name>effectTransparency</name>
+      <resource href="effectTransparency.txt"/>
+    </Item>
+    <Item>
+      <name>configHeader</name>
+      <resource href="configHeader.txt"/>
+    </Item>
+    <Item>
+      <name>okButton</name>
+      <resource href="okButton.txt"/>
+    </Item>
+    <Item>
+      <name>headerBG</name>
+      <resource href="headerBG.txt"/>
+    </Item>
+    <Item>
+      <name>headerNormal</name>
+      <resource href="headerNormal.txt"/>
+    </Item>
+    <Item>
+      <name>useInRatingPVP</name>
+      <resource href="useInRatingPVP.txt"/>
+    </Item>
+    <Item>
+      <name>useInAnyBG</name>
+      <resource href="useInAnyBG.txt"/>
+    </Item>
+  </items>
+</UIRelatedTexts>
