@@ -166,7 +166,7 @@ function ButtonPressed(params)
 end
 
 function Init()
-	local template = createWidget(nil, "Template", "Template")
+	local template = getChild(mainForm, "Template")
 	setTemplateWidget(template)
 		
 	local button=createWidget(mainForm, "EFButton", "Button", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 40, 25, 300, 120)

@@ -1,14 +1,13 @@
 local m_template = nil
 
 function CreateMainSettingsForm()
-	m_template = createWidget(nil, "Template", "Template")
+	m_template = getChild(mainForm, "Template")
 	setTemplateWidget(m_template)
 	
-	local form=createWidget(nil, "mainSettingsForm", "Form", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 700, 420, 200, 100)
+	local form=createWidget(mainForm, "mainSettingsForm", "Panel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 700, 420, 200, 100)
 	hide(form)
-	priority(form, 5000)
+	priority(form, 5)
 
-	local configPanel=createWidget(form, "Panel", "Panel")
 
 	setLocaleText(createWidget(form, "configHeader", "TextView",  WIDGET_ALIGN_CENTER, nil, 100, 20, nil, 20))
 	setText(createWidget(form, "closeButton", "Button", WIDGET_ALIGN_HIGH, WIDGET_ALIGN_LOW, 20, 20, 20, 20), "x")
@@ -33,7 +32,7 @@ function CreateMainSettingsForm()
 	createWidget(form, "useInRatingPVP", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 310)
 	createWidget(form, "useInAnyBG", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 340)
 	
-	DnD:Init(form, configPanel, true)
+	DnD:Init(form, form, true)
 		
 	return form
 end
