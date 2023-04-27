@@ -32,7 +32,7 @@ function CreateMainSettingsForm()
 	createWidget(form, "useInRatingPVP", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 310)
 	createWidget(form, "useInAnyBG", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 340)
 	
-	DnD:Init(form, form, true)
+	DnD.Init(form, form, true)
 		
 	return form
 end

@@ -11,19 +11,19 @@ function onAOPanelStart( params )
 		userMods.SendEvent( "AOPANEL_SEND_ADDON",
 			{ name = common.GetAddonName(), sysName = common.GetAddonName(), param = params } )
 
-		hide(getChild(mainForm, "EFButton"))
+		DnD.HideWdg(getChild(mainForm, "EFButton"))
 	end
 end
 
 function onAOPanelLeftClick( params )
 	if params.sender == common.GetAddonName() then
-		swap(m_mainForm)
+		DnD.SwapWdg(m_mainForm)
 	end
 end
 
 function onAOPanelChange( params )
 	if params.unloading and params.name == "UserAddon/AOPanelMod" then
-		show(getChild(mainForm, "EFButton"))
+		DnD.ShowWdg(getChild(mainForm, "EFButton"))
 	end
 end
 
@@ -34,7 +34,7 @@ function enableAOPanelIntegration( enable )
 	if enable then
 		onAOPanelStart()
 	else
-		show(getChild(mainForm, "EFButton"))
+		DnD.ShowWdg(getChild(mainForm, "EFButton"))
 	end
 end
 
@@ -179,9 +179,9 @@ function Init()
 	common.RegisterEventHandler(OnEventSecondTimer, "EVENT_SECOND_TIMER")
 	
 	
-	AddReaction("EFButton", function () swap(m_mainForm) end)
-	AddReaction("closeButton", function (aWdg) swap(m_mainForm) end)
-	AddReaction("okButton", function (aWdg) SaveMainFormSettings(m_mainForm) g_flagEnabled=nil swap(m_mainForm) end)
+	AddReaction("EFButton", function () DnD.SwapWdg(m_mainForm) end)
+	AddReaction("closeButton", function (aWdg) DnD.SwapWdg(m_mainForm) end)
+	AddReaction("okButton", function (aWdg) SaveMainFormSettings(m_mainForm) g_flagEnabled=nil DnD.SwapWdg(m_mainForm) end)
 	
 	
 	LoadMainFormSettings(m_mainForm)
