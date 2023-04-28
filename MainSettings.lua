@@ -1,10 +1,24 @@
 local m_template = nil
+local m_locale = getLocale()
+
+Global("DISABLE_CLICK", 0)
+Global("LOW_CLICK", 1)
+Global("MEDIUM_CLICK", 2)
+Global("HIGH_CLICK", 3)
+
+
+local m_actionSwitch = {}
+m_actionSwitch[DISABLE_CLICK] = m_locale["DISABLE_CLICK"]
+m_actionSwitch[LOW_CLICK] = m_locale["LOW_CLICK"]
+m_actionSwitch[MEDIUM_CLICK] = m_locale["MEDIUM_CLICK"]
+m_actionSwitch[HIGH_CLICK] = m_locale["HIGH_CLICK"]
+
 
 function CreateMainSettingsForm()
 	m_template = getChild(mainForm, "Template")
 	setTemplateWidget(m_template)
 	
-	local form=createWidget(mainForm, "mainSettingsForm", "Panel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 700, 420, 200, 100)
+	local form=createWidget(mainForm, "mainSettingsForm", "Panel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 700, 450, 200, 100)
 	hide(form)
 	priority(form, 5)
 
@@ -17,20 +31,20 @@ function CreateMainSettingsForm()
 	
 	local groupBG = createWidget(form, "groupBG", "Panel")
 	align(groupBG, WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW)
-	resize(groupBG, 340, 250)
+	resize(groupBG, 340, 280)
 	move(groupBG, 4, 50)
 	setLocaleText(createWidget(groupBG, "headerBG", "TextView",  WIDGET_ALIGN_CENTER, nil, 90, 20, nil, 2))
 	FillGroupSettings(groupBG)
 	
 	local groupNormal = createWidget(form, "groupNormal", "Panel")
 	align(groupNormal, WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW)
-	resize(groupNormal, 340, 250)
+	resize(groupNormal, 340, 280)
 	move(groupNormal, 350, 50)
 	setLocaleText(createWidget(groupNormal, "headerNormal", "TextView",  WIDGET_ALIGN_CENTER, nil, 150, 20, nil, 2))
 	FillGroupSettings(groupNormal)
 	
-	createWidget(form, "useInRatingPVP", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 310)
-	createWidget(form, "useInAnyBG", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 340)
+	createWidget(form, "useInRatingPVP", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 340)
+	createWidget(form, "useInAnyBG", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 370)
 	
 	DnD.Init(form, form, true)
 		
@@ -44,9 +58,11 @@ function FillGroupSettings(aGroup)
 	createWidget(aGroup, "useMageEffects", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 120)
 	createWidget(aGroup, "useGrass", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 150)
 	createWidget(aGroup, "useProcTextures", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 180)
+	setLocaleText(createWidget(aGroup, "shadowQualityTxt", "TextView",  WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 150, 25, 10, 210))
+	createWidget(aGroup, "shadowQuality", "ModePanel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 80, 25, 250, 210)
 
-	setLocaleText(createWidget(aGroup, "effectTransparency", "TextView", nil, nil, 300, 25, 10, 214))
-	createWidget(aGroup, "effectTransEdit", "EditLine", nil, nil, 35, 25, 299, 210, nil, nil)
+	setLocaleText(createWidget(aGroup, "effectTransparency", "TextView", nil, nil, 300, 25, 10, 244))
+	createWidget(aGroup, "effectTransEdit", "EditLine", nil, nil, 35, 25, 299, 240, nil, nil)
 end
 
 local m_currSettings = nil
@@ -61,6 +77,39 @@ function CheckPercents(aValue)
 	end
 	
 	return aValue
+end
+
+function GetSwitchIndexByName(anArr, aName)
+	for i, v in pairs(anArr) do
+		if compareStrWithConvert(v, aName) then
+			return i
+		end
+	end
+	return 0
+end
+
+function GetCurrentSwitchIndex(aWdg)
+	local txtWdg = getChild(aWdg, "ModeNameTextView")
+	local currValue = common.ExtractWStringFromValuedText(txtWdg:GetValuedText())
+	return GetSwitchIndexByName(m_actionSwitch, currValue)
+end
+
+function SetSwitchIndex(aWdg, anIndex)
+	if anIndex == nil then
+		anIndex = 0
+	end
+	
+	local txtWdg = getChild(aWdg, "ModeNameTextView")
+	txtWdg:SetVal("Name", m_actionSwitch[anIndex])
+end
+
+function SwitchActionClickBtn(aWdg)
+	local currInd = GetCurrentSwitchIndex(aWdg)
+	currInd = currInd + 1
+	if currInd > HIGH_CLICK then
+		currInd = DISABLE_CLICK
+	end
+	SetSwitchIndex(aWdg, currInd)
 end
 
 function SaveMainFormSettings(aForm)
@@ -90,6 +139,7 @@ function SetSettingsForGroup(aGroupWdg)
 	group.useGrass = getCheckBoxState(getChild(aGroupWdg, "useGrass"))
 	group.useProcTextures = getCheckBoxState(getChild(aGroupWdg, "useProcTextures"))
 	group.effectTransTxt = CheckPercents(getTextString(getChild(aGroupWdg, "effectTransEdit")))
+	group.shadowQuality = GetCurrentSwitchIndex(getChild(aGroupWdg, "shadowQuality"))
 	
 	return group
 end
@@ -102,6 +152,10 @@ function LoadSettingsForGroup(aGroup, aSettings)
 	setLocaleText(getChild(aGroup, "useGrass"), aSettings.useGrass)
 	setLocaleText(getChild(aGroup, "useProcTextures"), aSettings.useProcTextures)
 	setText(getChild(aGroup, "effectTransEdit"), aSettings.effectTransTxt)
+	if aSettings.shadowQuality == nil then	
+		aSettings.shadowQuality = 0
+	end
+	SetSwitchIndex(getChild(aGroup, "shadowQuality"), aSettings.shadowQuality)
 end
 
 function LoadMainFormSettings(aForm)
@@ -119,6 +173,7 @@ function LoadMainFormSettings(aForm)
 		savedSettings.groupBG.useGrass = false
 		savedSettings.groupBG.useProcTextures = false
 		savedSettings.groupBG.effectTransTxt = "30"
+		savedSettings.groupBG.shadowQuality = 0
 		
 		savedSettings.groupNormal = ReadGameSettings()
 		
@@ -154,7 +209,7 @@ function ReadGameSettings()
 							local optionId = optionIds[optionIndex]
 							local optionInfo = options.GetOptionInfo( optionId )
 							if pageIndex == 1 and groupIndex == 0 and blockIndex == 0 then 
-								if optionIndex == 8 then
+								if optionIndex == 4 then
 									groupNormal.useProcTextures = optionInfo.currentIndex == 1
 								end
 							end
@@ -178,6 +233,11 @@ function ReadGameSettings()
 								elseif 	optionIndex == 1 then
 									groupNormal.useMageEffects = optionInfo.currentIndex == 0
 								end							
+							end
+							if pageIndex == 1 and groupIndex == 0 and blockIndex == 0 then 
+								if optionIndex == 10 then
+									groupNormal.shadowQuality = optionInfo.currentIndex
+								end
 							end
 						end
 					end

@@ -53,5 +53,25 @@
       <name>useInAnyBG</name>
       <resource href="useInAnyBG.txt"/>
     </Item>
+	<Item>
+      <name>DISABLE_CLICK</name>
+      <resource href="DISABLE_CLICK.txt"/>
+    </Item>
+	<Item>
+      <name>LOW_CLICK</name>
+      <resource href="LOW_CLICK.txt"/>
+    </Item>
+	<Item>
+      <name>MEDIUM_CLICK</name>
+      <resource href="MEDIUM_CLICK.txt"/>
+    </Item>
+	<Item>
+      <name>HIGH_CLICK</name>
+      <resource href="HIGH_CLICK.txt"/>
+    </Item>
+	<Item>
+      <name>shadowQualityTxt</name>
+      <resource href="shadowQualityTxt.txt"/>
+    </Item>
   </items>
 </UIRelatedTexts>

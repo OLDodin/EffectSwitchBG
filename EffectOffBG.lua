@@ -22,7 +22,7 @@ function onAOPanelLeftClick( params )
 end
 
 function onAOPanelChange( params )
-	if params.unloading and params.name == "UserAddon/AOPanelMod" then
+	if params.unloading and string.find(params.name, "AOPanel") then
 		DnD.ShowWdg(getChild(mainForm, "EFButton"))
 	end
 end
@@ -64,11 +64,18 @@ function OnBattleChanged(anEnabled)
 							local optionId = optionIds[optionIndex]
 							local optionInfo = options.GetOptionInfo( optionId )
 							if pageIndex == 1 and groupIndex == 0 and blockIndex == 0 then 
-								if optionIndex == 8 then
+								if optionIndex == 4 then
 									if anEnabled then
 										options.SetOptionCurrentIndex( optionId, settings.groupBG.useProcTextures and 1 or 0)
 									else
 										options.SetOptionCurrentIndex( optionId, settings.groupNormal.useProcTextures and 1 or 0)
+									end
+								end
+								if optionIndex == 10 then
+									if anEnabled then
+										options.SetOptionCurrentIndex( optionId, settings.groupBG.shadowQuality)
+									else
+										options.SetOptionCurrentIndex( optionId, settings.groupNormal.shadowQuality)
 									end
 								end
 							end
@@ -157,7 +164,7 @@ end
 function RunReaction(widget)
 	local name=getName(widget)
 	if not name or not m_reactions or not m_reactions[name] then return end
-	m_reactions[name]()
+	m_reactions[name](widget)
 end
 
 function ButtonPressed(params)
@@ -182,7 +189,7 @@ function Init()
 	AddReaction("EFButton", function () DnD.SwapWdg(m_mainForm) end)
 	AddReaction("closeButton", function (aWdg) DnD.SwapWdg(m_mainForm) end)
 	AddReaction("okButton", function (aWdg) SaveMainFormSettings(m_mainForm) g_flagEnabled=nil DnD.SwapWdg(m_mainForm) end)
-	
+	AddReaction("GetModeBtn", function (aWdg) SwitchActionClickBtn(getParent(aWdg)) end)
 	
 	LoadMainFormSettings(m_mainForm)
 	
