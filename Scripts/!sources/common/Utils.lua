@@ -1,6 +1,5 @@
 local cachedToWString = userMods.ToWString
 local cachedFromWString = userMods.FromWString
-local cachedIsWString = common.IsWString
 local cachedIsExist = object.IsExist
 local cachedIsUnit = object.IsUnit
 local cachedCreateValuedText = common.CreateValuedText
@@ -33,7 +32,7 @@ end
 
 function toWString(text)
 	if not text then return nil end
-	if not cachedIsWString(text) then
+	if apitype(text) ~= "WString" then
 		text=cachedToWString(tostring(text))
 	end
 	return text
@@ -41,7 +40,7 @@ end
 
 local function toStringUtils(text)
 	if not text then return nil end
-	if cachedIsWString(text) then
+	if apitype(text) == "WString" then
 		text=cachedFromWString(text)
 	end
 	return tostring(text)
@@ -138,7 +137,7 @@ end
 
 
 function formatText(text, align, fontSize, shadow, outline, fontName)
-	local firstPart = "<body fontname='"..(toStringUtils(fontName) or "AllodsWest")
+	local firstPart = "<body fontname='"..(toStringUtils(fontName) or "AllodsFantasy")
 					.."' alignx = '"..(align or "left")
 					.."' fontsize='"..(fontSize and tostring(fontSize) or "14")
 					.."' shadow='"..(shadow and tostring(shadow) or "0")
@@ -397,7 +396,7 @@ function getParent(widget, num)
 	return getParent(parent, num-1)
 end
 
-function createWidget(parent, widgetName, templateName, alignX, alignY, width, height, posX, posY, noParent)
+function createWidget(parent, widgetName, templateName, alignX, alignY, width, height, posX, posY)
 	local widget = nil
 	local desc = getDesc(templateName)
 	if not desc then
@@ -411,7 +410,6 @@ function createWidget(parent, widgetName, templateName, alignX, alignY, width, h
 		LogInfo("Fail create widget type of ", templateName)
 		return
 	end
-	
 	setName(widget, widgetName)
 	updatePlacementPlain(widget, alignX, alignY, posX, posY, width, height)
 	return widget
@@ -530,7 +528,7 @@ function effectDone(aParams)
 
 	local findedWdg = nil
 	for _, v in pairs(m_loopEffects) do
-		if aParams.wtOwner:IsEqual(v.widget) then
+		if v.widget:IsValid() and aParams.wtOwner:IsEqual(v.widget) then
 			findedWdg = v
 			break
 		end

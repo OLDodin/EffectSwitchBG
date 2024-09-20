@@ -4,27 +4,34 @@ echo Starting...
 setlocal disabledelayedexpansion
 set startPath=%~dp0
 
+
 for /d %%B in (.\*) do (
 	if %%B NEQ .\jit (
 		MD ..\%%B
 		for %%i in ("%%B\*.lua") do (
-			call :CompileFunction %startPath% %%i
+			call :CompileFunction %%i "true"
 		)
 	)
 )
 
 for %%i in (*.lua) do (
-	call :CompileFunction %startPath% %%i
+	call :CompileFunction %%i "false"
 )
 goto :EXIT
 
 
 :CompileFunction
-set subPath=%2
-set srcPath=%1\%2
-set destPath=%1..\%subPath:~0,-4%
+set subPath=%1
 
-echo Converting %2
+
+if %2 EQU "true" (
+	set srcPath=%startPath%%subPath:~2%
+) else (
+	set srcPath=%startPath%%1
+)
+set destPath=%startPath%..\%subPath:~0,-4%
+
+echo Converting %srcPath%
 
 cd /d "c:\LuaJIT\x86\" 
 c:\LuaJIT\x86\luajit.exe -bg "%srcPath%" "%destPath%.luac.x86"
