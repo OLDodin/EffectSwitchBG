@@ -1,4 +1,5 @@
 local g_flagEnabled = nil
+local m_tickCnt = 0
 local m_mainForm = nil
 
 local IsAOPanelEnabled = GetConfig( "EnableAOPanel" ) or GetConfig( "EnableAOPanel" ) == nil
@@ -79,7 +80,7 @@ function OnBattleChanged(anEnabled)
 									end
 								end
 							end
-							if pageIndex == 1 and groupIndex == 0 and blockIndex == 2 then 
+							if pageIndex == 1 and groupIndex == 0 and blockIndex == 3 then 
 								if anEnabled then
 									if optionIndex == 0 then
 										options.SetOptionCurrentIndex( optionId, settings.groupBG.useAtmoEffects and 1 or 0)
@@ -98,7 +99,7 @@ function OnBattleChanged(anEnabled)
 									end
 								end
 							end
-							if pageIndex == 1 and groupIndex == 0 and blockIndex == 3 then 
+							if pageIndex == 1 and groupIndex == 0 and blockIndex == 4 then 
 								if optionIndex == 0 then
 									if anEnabled then
 										options.SetOptionCurrentIndex( optionId, settings.groupBG.useGrass and 1 or 0)
@@ -134,6 +135,12 @@ function OnBattleChanged(anEnabled)
 end
 
 local function OnEventSecondTimer()
+	m_tickCnt = m_tickCnt + 1
+	if m_tickCnt < 5 then 
+		return
+	else
+		m_tickCnt = 0
+	end
 	local switchActive = false
 	if matchMaking.CanUseMatchMaking() and matchMaking.IsEventProgressExist() then
 		local battleInfo = matchMaking.GetCurrentBattleInfo()
