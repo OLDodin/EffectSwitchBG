@@ -1,4 +1,3 @@
-local m_template = nil
 local m_locale = getLocale()
 
 Global("DISABLE_CLICK", 0)
@@ -14,9 +13,11 @@ m_actionSwitch[MEDIUM_CLICK] = m_locale["MEDIUM_CLICK"]
 m_actionSwitch[HIGH_CLICK] = m_locale["HIGH_CLICK"]
 
 
+local m_effectTransSliderBG = nil
+local m_effectTransSliderNormal = nil
+
 function CreateMainSettingsForm()
-	m_template = getChild(mainForm, "Template")
-	setTemplateWidget(m_template)
+	setTemplateWidget("common")
 	
 	local form=createWidget(mainForm, "mainSettingsForm", "Panel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 700, 450, 200, 100)
 	hide(form)
@@ -34,14 +35,14 @@ function CreateMainSettingsForm()
 	resize(groupBG, 340, 280)
 	move(groupBG, 4, 50)
 	setLocaleText(createWidget(groupBG, "headerBG", "TextView",  WIDGET_ALIGN_CENTER, nil, 90, 20, nil, 2))
-	FillGroupSettings(groupBG)
+	m_effectTransSliderBG = FillGroupSettings(groupBG)
 	
 	local groupNormal = createWidget(form, "groupNormal", "Panel")
 	align(groupNormal, WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW)
 	resize(groupNormal, 340, 280)
 	move(groupNormal, 350, 50)
 	setLocaleText(createWidget(groupNormal, "headerNormal", "TextView",  WIDGET_ALIGN_CENTER, nil, 150, 20, nil, 2))
-	FillGroupSettings(groupNormal)
+	m_effectTransSliderNormal = FillGroupSettings(groupNormal)
 	
 	createWidget(form, "useInRatingPVP", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 340)
 	createWidget(form, "useInAnyBG", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 370)
@@ -60,24 +61,30 @@ function FillGroupSettings(aGroup)
 	createWidget(aGroup, "useProcTextures", "CheckBox", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 316, 25, 10, 180)
 	setLocaleText(createWidget(aGroup, "shadowQualityTxt", "TextView",  WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 150, 25, 10, 210))
 	CheckDropDownOrientation(GenerateBtnForDropDown(createWidget(aGroup, "shadowQuality", "DropDownPanel", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 80, 25, 250, 210), m_actionSwitch))
-
-	setLocaleText(createWidget(aGroup, "effectTransparency", "TextView", nil, nil, 300, 25, 10, 244))
-	createWidget(aGroup, "effectTransEdit", "EditLine", nil, nil, 35, 25, 299, 240, nil, nil)
+	
+	local effectTransSlider = CreateSlider(aGroup, "effectTransSlider", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 320, 25, 10, 240)
+	local sliderParams	= {
+							valueMin	= 10,
+							valueMax	= 100,
+							stepsCount	= 9,
+							value		= 10,
+							description = getLocale()["effectTransparency"],
+							sliderWidth		= 46,
+							descTextAttr = {
+								color = "0xffffffff"
+							},
+							valueTextAttr = {
+							--	color = "0xffffffff"
+							},
+							formatFunc = function(aValue)
+								return common.FormatInt(aValue, '%d').."%"
+							end
+						}
+	effectTransSlider:Init(sliderParams)
+	return effectTransSlider
 end
 
 local m_currSettings = nil
-function CheckPercents(aValue)
-	local val = tonumber(aValue)
-	if not val then 
-		aValue = "100" 
-	elseif val < 10 then 
-		aValue = "10"
-	elseif val > 100 then 
-		aValue = "100" 
-	end
-	
-	return aValue
-end
 
 function GetSwitchIndexByName(anArr, aName)
 	for i, v in pairs(anArr) do
@@ -115,13 +122,13 @@ end
 --redefine function from ReactionHelper
 function GenerateBtnForDropDown(anWidget, aTextArr, aDefaultIndex, aColor)
 	local selectPanel = getChild(anWidget, "DropDownSelectPanel")
-	setTemplateWidget(selectPanel)
+	setTemplateWidget("common")
 	if not aColor then
 		aColor = "ColorWhite"
 	end
 	local cnt = 0
 	for i=0, GetTableSize(aTextArr)-1 do
-		local btn = createWidget(selectPanel, "modeBtn"..tostring(i), "SelectButton", WIDGET_ALIGN_BOTH, WIDGET_ALIGN_LOW, nil, 25, 0, 24*(i)+2)
+		local btn = createWidget(selectPanel, "modeBtn"..tostring(i), "DropDownSelectButton", WIDGET_ALIGN_BOTH, WIDGET_ALIGN_LOW, nil, 25, 0, 24*(i)+2)
 		setText(btn, aTextArr[i], aColor)
 		show(btn)
 		cnt = cnt + 1
@@ -133,7 +140,6 @@ function GenerateBtnForDropDown(anWidget, aTextArr, aDefaultIndex, aColor)
 	setText(getChild(getChild(anWidget, "DropDownHeaderPanel"), "ModeNameTextView"), aTextArr[aDefaultIndex], "Neutral", "left", 11)
 	
 	resize(anWidget, nil, 24*(cnt+1))
-	setTemplateWidget(m_template)
 	
 	return anWidget
 end
@@ -148,8 +154,8 @@ function SaveMainFormSettings(aForm)
 	local groupBG = getChild(aForm, "groupBG")
 	local groupNormal = getChild(aForm, "groupNormal")
 	
-	mySettings.groupBG = SetSettingsForGroup(groupBG)
-	mySettings.groupNormal = SetSettingsForGroup(groupNormal)
+	mySettings.groupBG = SetSettingsForGroup(groupBG, m_effectTransSliderBG)
+	mySettings.groupNormal = SetSettingsForGroup(groupNormal, m_effectTransSliderNormal)
 
 
 	m_currSettings = mySettings
@@ -157,7 +163,7 @@ function SaveMainFormSettings(aForm)
 	LoadMainFormSettings(aForm)
 end
 
-function SetSettingsForGroup(aGroupWdg)
+function SetSettingsForGroup(aGroupWdg, aSlider)
 	group = {}
 	group.useAtmoEffects = getCheckBoxState(getChild(aGroupWdg, "useAtmoEffects"))
 	group.usePostEffects = getCheckBoxState(getChild(aGroupWdg, "usePostEffects"))
@@ -165,27 +171,27 @@ function SetSettingsForGroup(aGroupWdg)
 	group.useMageEffects = getCheckBoxState(getChild(aGroupWdg, "useMageEffects"))
 	group.useGrass = getCheckBoxState(getChild(aGroupWdg, "useGrass"))
 	group.useProcTextures = getCheckBoxState(getChild(aGroupWdg, "useProcTextures"))
-	group.effectTransTxt = CheckPercents(getTextString(getChild(aGroupWdg, "effectTransEdit")))
+	group.effectTransTxt = tostring(aSlider:Get())
 	group.shadowQuality = GetCurrentSwitchIndex(getChild(aGroupWdg, "shadowQuality"))
 	
 	return group
 end
 
-function LoadSettingsForGroup(aGroup, aSettings)
+function LoadSettingsForGroup(aGroup, aSettings, aSlider)
 	setLocaleText(getChild(aGroup, "useAtmoEffects"), aSettings.useAtmoEffects)
 	setLocaleText(getChild(aGroup, "usePostEffects"), aSettings.usePostEffects)
 	setLocaleText(getChild(aGroup, "useLightEffects"), aSettings.useLightEffects)
 	setLocaleText(getChild(aGroup, "useMageEffects"), aSettings.useMageEffects)
 	setLocaleText(getChild(aGroup, "useGrass"), aSettings.useGrass)
 	setLocaleText(getChild(aGroup, "useProcTextures"), aSettings.useProcTextures)
-	setText(getChild(aGroup, "effectTransEdit"), aSettings.effectTransTxt)
+	aSlider:Set(tonumber(aSettings.effectTransTxt))
 	if aSettings.shadowQuality == nil then	
 		aSettings.shadowQuality = 0
 	end
 	SetSwitchIndex(getChild(aGroup, "shadowQuality"), aSettings.shadowQuality)
 end
 
-function LoadMainFormSettings(aForm)
+function InitSettings()
 	local savedSettings = userMods.GetGlobalConfigSection("EffectsOff")
 	if not savedSettings then
 		savedSettings = {}
@@ -207,13 +213,17 @@ function LoadMainFormSettings(aForm)
 		userMods.SetGlobalConfigSection("EffectsOff", savedSettings)
 	end
 	
-	LoadSettingsForGroup(getChild(aForm, "groupBG"), savedSettings.groupBG)
-	LoadSettingsForGroup(getChild(aForm, "groupNormal"), savedSettings.groupNormal)
-	
-	setLocaleText(getChild(aForm, "useInRatingPVP"), savedSettings.useInRatingPVP)
-	setLocaleText(getChild(aForm, "useInAnyBG"), savedSettings.useInAnyBG)
-	
 	m_currSettings = savedSettings
+end
+
+function LoadMainFormSettings(aForm)
+
+	LoadSettingsForGroup(getChild(aForm, "groupBG"), m_currSettings.groupBG, m_effectTransSliderBG)
+	LoadSettingsForGroup(getChild(aForm, "groupNormal"), m_currSettings.groupNormal, m_effectTransSliderNormal)
+	
+	setLocaleText(getChild(aForm, "useInRatingPVP"), m_currSettings.useInRatingPVP)
+	setLocaleText(getChild(aForm, "useInAnyBG"), m_currSettings.useInAnyBG)
+
 end
 
 function ReadGameSettings()

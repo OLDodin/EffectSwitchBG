@@ -2,7 +2,7 @@ local g_flagEnabled = nil
 local m_tickCnt = 0
 local m_mainForm = nil
 
-local IsAOPanelEnabled = GetConfig( "EnableAOPanel" ) or GetConfig( "EnableAOPanel" ) == nil
+local IsAOPanelEnabled = true
 
 function onAOPanelStart( params )
 	if IsAOPanelEnabled then
@@ -18,7 +18,7 @@ end
 
 function onAOPanelLeftClick( params )
 	if params.sender == common.GetAddonName() then
-		DnD.SwapWdg(m_mainForm)
+		SwapMainSettingsForm()
 	end
 end
 
@@ -28,15 +28,12 @@ function onAOPanelChange( params )
 	end
 end
 
-function enableAOPanelIntegration( enable )
-	IsAOPanelEnabled = enable
-	SetConfig( "EnableAOPanel", enable )
-
-	if enable then
-		onAOPanelStart()
-	else
-		DnD.ShowWdg(getChild(mainForm, "EFButton"))
+function SwapMainSettingsForm()
+	if not m_mainForm then
+		m_mainForm = CreateMainSettingsForm()
+		LoadMainFormSettings(m_mainForm)
 	end
+	DnD.SwapWdg(m_mainForm)
 end
 
 function OnBattleChanged(anEnabled)
@@ -162,14 +159,13 @@ local function OnEventSecondTimer()
 end
 
 function Init()
-	local template = getChild(mainForm, "Template")
-	setTemplateWidget(template)
+	setTemplateWidget("common")
 		
-	local button=createWidget(mainForm, "EFButton", "Button", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 40, 25, 300, 120)
+	local button=createWidget(mainForm, "EFButton", "Button", WIDGET_ALIGN_LOW, WIDGET_ALIGN_LOW, 32, 32, 300, 120)
 	setText(button, "Eo")
-	DnD:Init(button, button, true)
+	DnD.Init(button, button, true)
 	
-	m_mainForm = CreateMainSettingsForm()
+	InitSettings()
 	
 	common.RegisterReactionHandler(ButtonPressed, "execute")
 	common.RegisterReactionHandler(DropDownBtnPressed, "DropDownBtnPressed")
@@ -181,11 +177,10 @@ function Init()
 	common.RegisterEventHandler(OnEventSecondTimer, "EVENT_SECOND_TIMER")
 	
 	
-	AddReaction("EFButton", function () DnD.SwapWdg(m_mainForm) end)
-	AddReaction("closeButton", function (aWdg) DnD.SwapWdg(m_mainForm) end)
-	AddReaction("okButton", function (aWdg) SaveMainFormSettings(m_mainForm) g_flagEnabled=nil DnD.SwapWdg(m_mainForm) end)
+	AddReaction("EFButton", SwapMainSettingsForm)
+	AddReaction("closeButton", SwapMainSettingsForm)
+	AddReaction("okButton", function (aWdg) SaveMainFormSettings(m_mainForm) g_flagEnabled=nil SwapMainSettingsForm() end)
 	
-	LoadMainFormSettings(m_mainForm)
 	
 	common.RegisterEventHandler( onAOPanelStart, "AOPANEL_START" )
 	common.RegisterEventHandler( onAOPanelLeftClick, "AOPANEL_BUTTON_LEFT_CLICK" )
