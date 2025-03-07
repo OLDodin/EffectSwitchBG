@@ -185,9 +185,6 @@ function LoadSettingsForGroup(aGroup, aSettings, aSlider)
 	setLocaleText(getChild(aGroup, "useGrass"), aSettings.useGrass)
 	setLocaleText(getChild(aGroup, "useProcTextures"), aSettings.useProcTextures)
 	aSlider:Set(tonumber(aSettings.effectTransTxt))
-	if aSettings.shadowQuality == nil then	
-		aSettings.shadowQuality = 0
-	end
 	SetSwitchIndex(getChild(aGroup, "shadowQuality"), aSettings.shadowQuality)
 end
 
@@ -211,6 +208,13 @@ function InitSettings()
 		savedSettings.groupNormal = ReadGameSettings()
 		
 		userMods.SetGlobalConfigSection("EffectsOff", savedSettings)
+	end
+	
+	if savedSettings.groupBG.shadowQuality == nil then	
+		savedSettings.groupBG.shadowQuality = 0
+	end
+	if savedSettings.groupNormal.shadowQuality == nil then	
+		savedSettings.groupNormal.shadowQuality = 0
 	end
 	
 	m_currSettings = savedSettings
