@@ -23,7 +23,7 @@ function onAOPanelLeftClick( params )
 end
 
 function onAOPanelChange( params )
-	if params.unloading and string.find(params.name, "AOPanel") then
+	if params.state == ADDON_STATE_NOT_LOADED and string.find(params.name, "AOPanel") then
 		DnD.ShowWdg(getChild(mainForm, "EFButton"))
 	end
 end
